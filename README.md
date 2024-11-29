@@ -10,28 +10,38 @@
 以下の手順でプロジェクトをインストールしてください。
 
 1. リポジトリをクローンします。
-```git clone https://github.com/Jyunta19/robosys_kadai.git```
+```
+git clone https://github.com/Jyunta19/robosys_kadai.git
+```
 
 2. リポジトリディレクトリに移動します。
-```cd robosys_kadai```
+```
+cd robosys_kadai
+```
 
 3. このプロジェクトはPython環境で動作します。
 
 ## 使い方
 1. コマンドを実行するには、英語のテキストを標準入力で渡してください。
-```echo "This is a sample text. This text is only a sample." | python3 word_freq.py```
+```
+echo "This is a sample text. This text is only a sample." | python3 word_freq.py
+```
 
 2. 出力例  
+```
 this: 2  
 is: 2  
 a: 2  
 sample: 2  
 text: 2  
 only: 1
+```
 
 ## テスト
-1. 以下のコマンドで、動作確認用のテストを実行できます。
-```python3 test_word_freq.py```
+1. 以下のコマンドで、動作確認用のテストを実行できます。  
+```
+python3 test_word_freq.py
+```
 
 2. すべてのテストに合格した場合、All tests passed! と表示されます。
 
