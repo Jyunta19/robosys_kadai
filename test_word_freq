@@ -2,8 +2,9 @@
 # SPDX-FileCopyrightText: 2024 Jyunta Suzuki 　　　　　
 # SPDX-License-Identifier: BSD-3-Clause
 
-ng () {
-    echo "${1}行目が違うよ"
+# エラー関数
+ng() {
+    echo "${1}行目のテストに失敗しました"
     res=1
 }
 
@@ -11,32 +12,72 @@ ng () {
 res=0
 
 # テストケース
-out=$(echo "This is a test. This is only a test." | ./word_freq)
-echo "$out" | grep -q "this: 2" && echo "$out" | grep -q "is: 2" && \
-echo "$out" | grep -q "a: 2" && echo "$out" | grep -q "test: 2" && \
-echo "$out" | grep -q "only: 1" || ng "$LINENO"
+# 各テストで標準出力と標準エラー出力を分けてキャプチャ
+run_test() {
+    input="$1"
+    expected_stdout="$2"
+    expected_status="$3"
+    line_no="$4"
 
-out=$(echo "Hello world! Hello everyone." | ./word_freq)
-echo "$out" | grep -q "hello: 2" && echo "$out" | grep -q "world: 1" && \
-echo "$out" | grep -q "everyone: 1" || ng "$LINENO"
+    # 標準出力と標準エラー出力を分離して取得
+    output=$(echo "$input" | ./word_freq 2>stderr_output | sort)  # 出力をソート
+    status=$?
 
-out=$(echo "Python is fun. Python is powerful." | ./word_freq)
-echo "$out" | grep -q "python: 2" && echo "$out" | grep -q "is: 2" && \
-echo "$out" | grep -q "fun: 1" && echo "$out" | grep -q "powerful: 1" || ng "$LINENO"
+    # 終了ステータスの確認
+    if [ "$status" -ne "$expected_status" ]; then
+        echo "終了ステータスが異なります: Expected=$expected_status, Got=$status"
+        ng "$line_no"
+    fi
 
-out=$(echo "12345 @@@ ###" | ./word_freq)
-[ -z "$out" ] || ng "$LINENO"  # 出力が空であることを確認
+    # 標準エラー出力が空かどうかを確認
+    if [ -s stderr_output ]; then
+        echo "標準エラー出力に予期しない内容があります:"
+        cat stderr_output
+        ng "$line_no"
+    fi
 
-out=$(echo "apple banana apple cherry cherry cherry" | ./word_freq)
-echo "$out" | grep -q "apple: 2" && echo "$out" | grep -q "banana: 1" && \
-echo "$out" | grep -q "cherry: 3" || ng "$LINENO"
+    # 標準出力の確認
+    if [ "$output" != "$(echo "$expected_stdout" | sort)" ]; then  # 期待値もソートして比較
+        echo "標準出力が異なります:"
+        echo "Expected:"
+        echo "$(echo "$expected_stdout" | sort)"
+        echo "Got:"
+        echo "$output"
+        ng "$line_no"
+    fi
+}
 
-# 結果
+# テスト1: 正常な入力
+run_test "This is a test. This is only a test." \
+"this: 2
+is: 2
+a: 2
+test: 2
+only: 1" 0 $LINENO
+
+# テスト2: 別の正常な入力
+run_test "Hello world! Hello everyone." \
+"hello: 2
+world: 1
+everyone: 1" 0 $LINENO
+
+# テスト3: 異常な入力（記号と数字のみ）
+run_test "12345 @@@ ###" "" 0 $LINENO
+
+# テスト4: 別の正常な入力
+run_test "apple banana apple cherry cherry cherry" \
+"apple: 2
+banana: 1
+cherry: 3" 0 $LINENO
+
+# 結果の表示
 if [ "$res" -eq 0 ]; then
     echo "All tests passed!"
 else
     echo "テストに失敗しました"
 fi
 
+# 一時ファイルの削除
+rm -f stderr_output
 exit $res
 
