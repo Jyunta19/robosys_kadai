@@ -14,7 +14,7 @@ git clone https://github.com/Jyunta19/robosys_kadai.git
 
 2. リポジトリディレクトリに移動します。
 ```
-cd robosys_kadai
+cd projects/robosys_kadai
 ```
 
 3. 英語のテキストを入力し、 コマンドを実行します。
