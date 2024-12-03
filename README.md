@@ -9,7 +9,7 @@
 ## 使い方
 1. リポジトリをクローンします。
 ```
-git clone https://github.com/Jyunta19/robosys_kadai.git
+git clone https://github.com/Jyunta19/robosys_kadai
 ```
 
 2. リポジトリディレクトリに移動します。
